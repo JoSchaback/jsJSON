@@ -1,2 +1,2 @@
-# jsJSON
-Small JSON lib in C
+# jsArray
+Simple dynamic array in C
