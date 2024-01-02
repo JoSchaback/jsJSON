@@ -279,7 +279,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
     //printf("jsJSON_parseObject(): going into while loop [%s]\n", tokenizer->token);
     while( tokenizer->token[0] != '}' ) {
         jsJSON_Tokenizer_expectType(tokenizer, jsJSON_TokenType_STRING);
-        char* name = strdup(tokenizer->token);
+        char* name = _strdup(tokenizer->token);
         //printf("   name [%s]\n", name);
         jsJSON_Tokenizer_nextExpectChar(tokenizer, ':'); // jump over string to colon
         jsJSON_Tokenizer_next(tokenizer); // jump over colon
@@ -291,7 +291,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
             jsJSON* child = jsJSON_parseArray(tokenizer, name);
             jsJSON_add(root, child);
         } else if( tokenizer->tokenType == jsJSON_TokenType_STRING ) {
-            jsJSON_addString(root, name, strdup(tokenizer->token));
+            jsJSON_addString(root, name, _strdup(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_NUMBER ) {
             jsJSON_addNumber(root, name, atof(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_BOOLEAN ) {
@@ -320,7 +320,7 @@ static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key) {
             jsJSON* child = jsJSON_parseArray(tokenizer, NULL);
             jsJSON_add(root, child);
         } else if( tokenizer->tokenType == jsJSON_TokenType_STRING ) {
-            jsJSON_addString(root, NULL, strdup(tokenizer->token));
+            jsJSON_addString(root, NULL, _strdup(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_NUMBER ) {
             jsJSON_addNumber(root, NULL, atof(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_BOOLEAN ) {
