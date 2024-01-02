@@ -271,6 +271,14 @@ static void jsJSON_Tokenizer_expectType(jsJSON_Tokenizer* tokenizer, enum jsJSON
         exit(1);
     }
 }
+
+char *jsJSON_strdup(char *src) {
+    char *dst = malloc(strlen (src) + 1);  // Space for length plus nul
+    if (dst == NULL) return NULL;          // No memory
+    strcpy(dst, src);                      // Copy the characters
+    return dst;                            // Return the new string
+}
+
 static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key);
 
 static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
@@ -279,7 +287,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
     //printf("jsJSON_parseObject(): going into while loop [%s]\n", tokenizer->token);
     while( tokenizer->token[0] != '}' ) {
         jsJSON_Tokenizer_expectType(tokenizer, jsJSON_TokenType_STRING);
-        char* name = _strdup(tokenizer->token);
+        char* name = jsJSON_strdup(tokenizer->token);
         //printf("   name [%s]\n", name);
         jsJSON_Tokenizer_nextExpectChar(tokenizer, ':'); // jump over string to colon
         jsJSON_Tokenizer_next(tokenizer); // jump over colon
@@ -291,7 +299,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
             jsJSON* child = jsJSON_parseArray(tokenizer, name);
             jsJSON_add(root, child);
         } else if( tokenizer->tokenType == jsJSON_TokenType_STRING ) {
-            jsJSON_addString(root, name, _strdup(tokenizer->token));
+            jsJSON_addString(root, name, jsJSON_strdup(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_NUMBER ) {
             jsJSON_addNumber(root, name, atof(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_BOOLEAN ) {
@@ -320,7 +328,7 @@ static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key) {
             jsJSON* child = jsJSON_parseArray(tokenizer, NULL);
             jsJSON_add(root, child);
         } else if( tokenizer->tokenType == jsJSON_TokenType_STRING ) {
-            jsJSON_addString(root, NULL, _strdup(tokenizer->token));
+            jsJSON_addString(root, NULL, jsJSON_strdup(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_NUMBER ) {
             jsJSON_addNumber(root, NULL, atof(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_BOOLEAN ) {

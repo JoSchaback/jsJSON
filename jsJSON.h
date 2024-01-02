@@ -45,5 +45,11 @@ jsJSON* jsJSON_addNumber(jsJSON* parent, char *key, double value);
 size_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize);
 jsJSON* jsJSON_parse(char *json);
 
+/**
+ * My own little version of strdup() because 
+ * I want to avoid issues on Windows where strdup is flagged as
+ * deprecated.
+*/
+char* jsJSON_strdup(char* src);
 
 #endif // JS_JSON_H
