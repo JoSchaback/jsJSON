@@ -31,7 +31,11 @@ jsJSON* jsJSON_newArray(char *key) {
 
 jsJSON* jsJSON_newString(char *key, char *value) {
     jsJSON* n = jsJSON_new(jsJSON_TYPE_STRING, key);
-    n->stringValue = jsJSON_strdup(value);
+    if( value != NULL ) {
+        n->stringValue = jsJSON_strdup(value);
+    } else {
+        n->stringValue = jsJSON_strdup("");
+    }
     return n;
 }
 
@@ -315,7 +319,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
         }
         // we dont need name anymore and thus can free it now
         free(name);
-        
+
         jsJSON_Tokenizer_nextExpectTwoOptions(tokenizer, ',', '}');
         if( tokenizer->token[0] == ',' ) {
             jsJSON_Tokenizer_next(tokenizer);
