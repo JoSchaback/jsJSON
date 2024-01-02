@@ -5,12 +5,15 @@
 #include <stdbool.h> // bool
 #include <stdint.h> // uint64_t
 
-
 jsJSON* jsJSON_new(enum jsJSON_TYPE type, char *key) {
     jsJSON* json = malloc(sizeof(jsJSON));
     json->type = type;
     json->boolValue = false;
-    json->key = key;
+    if( key != NULL ) {
+        json->key = jsJSON_strdup(key);
+    } else {
+        json->key = NULL;
+    }
     json->numberValue = 0;
     json->stringValue = NULL;
     json->children = NULL;
@@ -28,7 +31,7 @@ jsJSON* jsJSON_newArray(char *key) {
 
 jsJSON* jsJSON_newString(char *key, char *value) {
     jsJSON* n = jsJSON_new(jsJSON_TYPE_STRING, key);
-    n->stringValue = value;
+    n->stringValue = jsJSON_strdup(value);
     return n;
 }
 
@@ -287,6 +290,8 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
     //printf("jsJSON_parseObject(): going into while loop [%s]\n", tokenizer->token);
     while( tokenizer->token[0] != '}' ) {
         jsJSON_Tokenizer_expectType(tokenizer, jsJSON_TokenType_STRING);
+        // we need to duplicate the string because the tokenizer
+        // will overwrite the token on the next call to next()
         char* name = jsJSON_strdup(tokenizer->token);
         //printf("   name [%s]\n", name);
         jsJSON_Tokenizer_nextExpectChar(tokenizer, ':'); // jump over string to colon
@@ -299,7 +304,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
             jsJSON* child = jsJSON_parseArray(tokenizer, name);
             jsJSON_add(root, child);
         } else if( tokenizer->tokenType == jsJSON_TokenType_STRING ) {
-            jsJSON_addString(root, name, jsJSON_strdup(tokenizer->token));
+            jsJSON_addString(root, name, tokenizer->token);
         } else if( tokenizer->tokenType == jsJSON_TokenType_NUMBER ) {
             jsJSON_addNumber(root, name, atof(tokenizer->token));
         } else if( tokenizer->tokenType == jsJSON_TokenType_BOOLEAN ) {
@@ -308,6 +313,9 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
             printf("Error: unexpected token [%s]\n", tokenizer->token);
             exit(1);
         }
+        // we dont need name anymore and thus can free it now
+        free(name);
+        
         jsJSON_Tokenizer_nextExpectTwoOptions(tokenizer, ',', '}');
         if( tokenizer->token[0] == ',' ) {
             jsJSON_Tokenizer_next(tokenizer);
@@ -345,6 +353,11 @@ static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key) {
     return root;
 }
 
+/**
+ * Parses a JSON string into a tree structure of jsJSON nodes.
+ * Every node copies the key and values (either string, double or bool) 
+ * into its own memory so that the original JSON string can be freed.
+*/
 jsJSON* jsJSON_parse(char *json) {
     jsJSON_Tokenizer tokenizer = jsJSON_Tokenizer_new(json);
     jsJSON_Tokenizer_next(&tokenizer);
@@ -356,5 +369,27 @@ jsJSON* jsJSON_parse(char *json) {
     } else{
         printf("Error: unexpected token [%s]\n", tokenizer.token);
     }
+    return NULL;
+}
+
+/**
+ * Recursively frees all nodes in the tree including
+ * all children, sibblings and stringValues. Note that
+ * jsJSON duplicates all strings so that a node tree is
+ * self-contained.
+*/
+jsJSON* jsJSON_free(jsJSON *root) {
+    if (root->type == jsJSON_TYPE_STRING) {
+        free(root->stringValue);
+    }
+    if (root->type == jsJSON_TYPE_OBJECT || root->type == jsJSON_TYPE_ARRAY) {
+        jsJSON* child = root->children;
+        while( child != NULL ) {
+            jsJSON* next = child->sibblings;
+            jsJSON_free(child);
+            child = next;
+        }
+    }
+    free(root);
     return NULL;
 }

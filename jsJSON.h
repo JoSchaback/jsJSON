@@ -28,7 +28,16 @@ struct _jsJSON {
     jsJSON *children;
 };
 
+/**
+ * My own little version of strdup() because 
+ * I want to avoid issues on Windows where strdup is flagged as
+ * deprecated.
+*/
+char* jsJSON_strdup(char* src);
+
+
 jsJSON* jsJSON_new(enum jsJSON_TYPE type, char *key);
+jsJSON* jsJSON_free(jsJSON *root);
 jsJSON* jsJSON_newObject(char *key);
 jsJSON* jsJSON_newArray(char *key);
 jsJSON* jsJSON_newString(char *key, char *value);
@@ -44,12 +53,5 @@ jsJSON* jsJSON_addNumber(jsJSON* parent, char *key, double value);
 
 size_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize);
 jsJSON* jsJSON_parse(char *json);
-
-/**
- * My own little version of strdup() because 
- * I want to avoid issues on Windows where strdup is flagged as
- * deprecated.
-*/
-char* jsJSON_strdup(char* src);
 
 #endif // JS_JSON_H

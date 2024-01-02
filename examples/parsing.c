@@ -21,6 +21,10 @@ int main() {
     char buffer[1000];
     jsJSON_serializeToStr(root, buffer, sizeof(buffer));
     printf("%s\n", buffer);
+
+    // free the tree
+    jsJSON_free(root);
+
     return 0;
 }
 
