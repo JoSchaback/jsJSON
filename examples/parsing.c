@@ -8,10 +8,16 @@
 #include <stdlib.h> // malloc(), free()
 
 int main() {
-
-    char* json = "{\"message\":\"hellosssss!\",\"some number\":0.003242,\"sub messages\":[\"this is m1\",\"this is m2asdasdaa\",\"this is m3\"]}";
+    // let's take another silly JSON example string and
+    // print it first on the console
+    char* json = "{\"message\":\"Hello!\",\"some number\":0.003242,\"sub messages\":[\"this is m1\",\"this is another element\",\"this is m3\"]}";
     printf("%s\n", json);   
+
+    // here is the magic of parsing the JSON string into a tree
     jsJSON* root = jsJSON_parse(json);
+
+    // now we serialize the tree back to a string buffer
+    // and print it on the console
     char buffer[1000];
     jsJSON_serializeToStr(root, buffer, sizeof(buffer));
     printf("%s\n", buffer);
