@@ -42,6 +42,8 @@ jsJSON* jsJSON_addArray(jsJSON* parent, char *key);
 jsJSON* jsJSON_addBoolean(jsJSON* parent, char *key, bool value);
 jsJSON* jsJSON_addNumber(jsJSON* parent, char *key, double value);
 
-uint64_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize);
+size_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize);
+jsJSON* jsJSON_parse(char *json);
+
 
 #endif // JS_JSON_H
