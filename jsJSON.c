@@ -397,3 +397,59 @@ jsJSON* jsJSON_free(jsJSON *root) {
     free(root);
     return NULL;
 }
+
+char*  jsJSON_getString(jsJSON* root, char* key) {
+    if( root->type != jsJSON_TYPE_OBJECT ) {
+        return NULL;
+    }
+    jsJSON* child = root->children;
+    while( child != NULL ) {
+        if( strcmp(child->key, key) == 0 ) {
+            return child->stringValue;
+        }
+        child = child->sibblings;
+    }
+    return NULL;
+}
+
+double jsJSON_getNumber(jsJSON* root, char* key) {
+    if( root->type != jsJSON_TYPE_OBJECT ) {
+        return -1;
+    }    
+    jsJSON* child = root->children;
+    while( child != NULL ) {
+        if( strcmp(child->key, key) == 0 ) {
+            return child->numberValue;
+        }
+        child = child->sibblings;
+    }
+    return -1;
+}
+
+bool jsJSON_getBoolean(jsJSON* root, char* key) {
+    if( root->type != jsJSON_TYPE_OBJECT ) {
+        return false;
+    }
+    jsJSON* child = root->children;
+    while( child != NULL ) {
+        if( strcmp(child->key, key) == 0 ) {
+            return child->boolValue;
+        }
+        child = child->sibblings;
+    }
+    return false;
+}
+
+jsJSON* jsJSON_getObject(jsJSON* root, char* key) {
+    if( root->type != jsJSON_TYPE_OBJECT ) {
+        return NULL;
+    }
+    jsJSON* child = root->children;
+    while( child != NULL ) {
+        if( strcmp(child->key, key) == 0 ) {
+            return child;
+        }
+        child = child->sibblings;
+    }
+    return NULL;
+}

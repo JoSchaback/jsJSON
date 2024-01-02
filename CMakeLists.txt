@@ -10,6 +10,7 @@ include(CTest)
 
 add_executable(hello_jsJSON examples/hello_jsJSON.c jsJSON)
 add_executable(parsing examples/parsing.c jsJSON)
+add_executable(mapping examples/mapping.c jsJSON)
 
 # Link the math library
 # target_link_libraries(usergen m)
@@ -23,3 +24,4 @@ add_library(jsJSON jsJSON.c jsJSON.h)
 
 add_test(NAME run_hello_jsJSON_example COMMAND hello_jsJSON)
 add_test(NAME run_parsing_example COMMAND parsing)
+add_test(NAME run_mapping_example COMMAND mapping)

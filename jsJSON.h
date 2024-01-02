@@ -129,4 +129,10 @@ size_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize);
 */
 jsJSON* jsJSON_parse(char *json);
 
+char*  jsJSON_getString(jsJSON* root, char* key);
+double jsJSON_getNumber(jsJSON* root, char* key);
+bool   jsJSON_getBoolean(jsJSON* root, char* key);
+bool   jsJSON_getBoolean(jsJSON* root, char* key);
+jsJSON* jsJSON_getObject(jsJSON* root, char* key);
+
 #endif // JS_JSON_H
