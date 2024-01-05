@@ -5,7 +5,7 @@
 #include <stdbool.h> // bool
 #include <stdint.h> // uint64_t
 
-jsJSON* jsJSON_new(enum jsJSON_TYPE type, char *key) {
+jsJSON* jsJSON_new(enum jsJSON_TYPE type, const char *key) {
     jsJSON* json = malloc(sizeof(jsJSON));
     json->type = type;
     json->boolValue = false;
@@ -21,15 +21,15 @@ jsJSON* jsJSON_new(enum jsJSON_TYPE type, char *key) {
     return json;
 }
 
-jsJSON* jsJSON_newObject(char *key) {
+jsJSON* jsJSON_newObject(const char *key) {
     return jsJSON_new(jsJSON_TYPE_OBJECT, key);
 }
 
-jsJSON* jsJSON_newArray(char *key) {
+jsJSON* jsJSON_newArray(const char *key) {
     return jsJSON_new(jsJSON_TYPE_ARRAY, key);
 }
 
-jsJSON* jsJSON_newString(char *key, char *value) {
+jsJSON* jsJSON_newString(const char *key, const char *value) {
     jsJSON* n = jsJSON_new(jsJSON_TYPE_STRING, key);
     if( value != NULL ) {
         n->stringValue = jsJSON_strdup(value);
@@ -39,13 +39,13 @@ jsJSON* jsJSON_newString(char *key, char *value) {
     return n;
 }
 
-jsJSON* jsJSON_newNumber(char *key, double value) {
+jsJSON* jsJSON_newNumber(const char *key, double value) {
     jsJSON* n = jsJSON_new(jsJSON_TYPE_NUMBER, key);
     n->numberValue = value;
     return n;
 }
 
-jsJSON* jsJSON_newBool(char *key, bool value) {
+jsJSON* jsJSON_newBool(const char *key, bool value) {
     jsJSON* n = jsJSON_new(jsJSON_TYPE_BOOL, key);
     n->boolValue = value;
     return n;
@@ -70,34 +70,34 @@ jsJSON* jsJSON_add(jsJSON* parent, jsJSON* child) {
     return child;
 }
 
-jsJSON* jsJSON_addString(jsJSON* parent, char *key, char *value) {
+jsJSON* jsJSON_addString(jsJSON* parent, const char *key, const char *value) {
     jsJSON* json = jsJSON_newString(key, value);
     return jsJSON_add(parent, json);
 }
 
-jsJSON* jsJSON_addObject(jsJSON* parent, char *key) {
+jsJSON* jsJSON_addObject(jsJSON* parent, const char *key) {
     return jsJSON_add(parent, jsJSON_newObject(key));
 }
 
-jsJSON* jsJSON_addArray(jsJSON* parent, char *key) {
+jsJSON* jsJSON_addArray(jsJSON* parent, const char *key) {
     return jsJSON_add(parent, jsJSON_newArray(key));
 }
 
-jsJSON* jsJSON_addBoolean(jsJSON* parent, char *key, bool value) {
+jsJSON* jsJSON_addBoolean(jsJSON* parent, const char *key, bool value) {
     return jsJSON_add(parent, jsJSON_newBool(key, value));
 }
 
-jsJSON* jsJSON_addNumber(jsJSON* parent, char *key, double value) {
+jsJSON* jsJSON_addNumber(jsJSON* parent, const char *key, double value) {
     return jsJSON_add(parent, jsJSON_newNumber(key, value));
 }
 
-void write(char* buffer, char* str, size_t bufferSize, size_t *bytesWritten) {
+void write(char* buffer, const char* str, size_t bufferSize, size_t *bytesWritten) {
     //printf("write: [%s], bufferSize: %llu, bytesWritten: %llu\n", str, bufferSize - *bytesWritten, *bytesWritten);
     int count = snprintf((char*)((size_t)buffer + (size_t)(*bytesWritten)), bufferSize - *bytesWritten, "%s", str);
     *bytesWritten += count;
 }
 
-static void jsJSON_serializeToStrRecursive(jsJSON* root, char *buffer, size_t bufferSize, size_t *bytesWritten) {
+static void jsJSON_serializeToStrRecursive(const jsJSON* root, char *buffer, size_t bufferSize, size_t *bytesWritten) {
     if (root->type == jsJSON_TYPE_OBJECT) {
         write(buffer, "{", bufferSize, bytesWritten);
         jsJSON* child = root->children;
@@ -144,7 +144,7 @@ static void jsJSON_serializeToStrRecursive(jsJSON* root, char *buffer, size_t bu
     }
 }
 
-size_t jsJSON_serializeToStr(jsJSON* root, char *buffer, size_t bufferSize) {
+size_t jsJSON_serializeToStr(const jsJSON* root, char *buffer, size_t bufferSize) {
     size_t bytesWritten = 0;
 
     jsJSON_serializeToStrRecursive(root, buffer, bufferSize, &bytesWritten);
@@ -162,7 +162,7 @@ enum jsJSON_TokenType {
 }; 
 
 typedef struct jsJSON_Tokenizer {
-    char* json;
+    const char* json;
     size_t index;
     size_t line;
     size_t column;
@@ -173,7 +173,7 @@ typedef struct jsJSON_Tokenizer {
     enum jsJSON_TokenType tokenType;
 } jsJSON_Tokenizer;
 
-static jsJSON_Tokenizer jsJSON_Tokenizer_new(char* json) {
+static jsJSON_Tokenizer jsJSON_Tokenizer_new(const char* json) {
     jsJSON_Tokenizer tokenizer;
     tokenizer.json = json;
     tokenizer.index = 0;
@@ -256,7 +256,7 @@ static void jsJSON_Tokenizer_next(jsJSON_Tokenizer* tokenizer) {
     tokenizer->isEOF = true;
 }
 
-static void jsJSON_Tokenizer_nextExpectChar(jsJSON_Tokenizer* tokenizer, char c) {
+static void jsJSON_Tokenizer_nextExpectChar(jsJSON_Tokenizer* tokenizer, const char c) {
     jsJSON_Tokenizer_next(tokenizer);
     if( tokenizer->token[0] != c ) {
         printf("expected char [%c] but found [%s] at line %zu, column %zu\n", c, tokenizer->token, tokenizer->line, tokenizer->column);
@@ -264,7 +264,7 @@ static void jsJSON_Tokenizer_nextExpectChar(jsJSON_Tokenizer* tokenizer, char c)
     }
 }
 
-static void jsJSON_Tokenizer_nextExpectTwoOptions(jsJSON_Tokenizer* tokenizer, char c1, char c2) {
+static void jsJSON_Tokenizer_nextExpectTwoOptions(jsJSON_Tokenizer* tokenizer, const char c1, const char c2) {
     jsJSON_Tokenizer_next(tokenizer);
     if( tokenizer->token[0] != c1 && tokenizer->token[0] != c2 ) {
         printf("expected char [%c] or [%c] but found [%s] at line %zu, column %zu\n", c1, c2, tokenizer->token, tokenizer->line, tokenizer->column);
@@ -272,23 +272,23 @@ static void jsJSON_Tokenizer_nextExpectTwoOptions(jsJSON_Tokenizer* tokenizer, c
     }
 }
 
-static void jsJSON_Tokenizer_expectType(jsJSON_Tokenizer* tokenizer, enum jsJSON_TokenType type) {
+static void jsJSON_Tokenizer_expectType(const jsJSON_Tokenizer* tokenizer, enum jsJSON_TokenType type) {
     if( tokenizer->tokenType != type ) {
         printf("expected token type [%d] but found [%s] at line %zu, column %zu\n", type, tokenizer->token, tokenizer->line, tokenizer->column);
         exit(1);
     }
 }
 
-char *jsJSON_strdup(char *src) {
+char *jsJSON_strdup(const char *src) {
     char *dst = malloc(strlen (src) + 1);  // Space for length plus nul
     if (dst == NULL) return NULL;          // No memory
     strcpy(dst, src);                      // Copy the characters
     return dst;                            // Return the new string
 }
 
-static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key);
+static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, const char *key);
 
-static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
+static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, const char *key) {
     jsJSON* root = jsJSON_newObject(key);
     jsJSON_Tokenizer_next(tokenizer);
     //printf("jsJSON_parseObject(): going into while loop [%s]\n", tokenizer->token);
@@ -328,7 +328,7 @@ static jsJSON* jsJSON_parseObject(jsJSON_Tokenizer* tokenizer, char *key) {
     return root;
 }
 
-static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key) {
+static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, const char *key) {
     jsJSON* root = jsJSON_newArray(key);
     jsJSON_Tokenizer_next(tokenizer);
     while( tokenizer->token[0] != ']' ) {
@@ -362,7 +362,7 @@ static jsJSON* jsJSON_parseArray(jsJSON_Tokenizer* tokenizer, char *key) {
  * Every node copies the key and values (either string, double or bool) 
  * into its own memory so that the original JSON string can be freed.
 */
-jsJSON* jsJSON_parse(char *json) {
+jsJSON* jsJSON_parse(const char *json) {
     jsJSON_Tokenizer tokenizer = jsJSON_Tokenizer_new(json);
     jsJSON_Tokenizer_next(&tokenizer);
     //printf("starting: %s\n", tokenizer.token);
@@ -398,7 +398,7 @@ jsJSON* jsJSON_free(jsJSON *root) {
     return NULL;
 }
 
-char*  jsJSON_getString(jsJSON* root, char* key) {
+char*  jsJSON_getString(const jsJSON* root, const char* key) {
     if( root->type != jsJSON_TYPE_OBJECT ) {
         return NULL;
     }
@@ -412,7 +412,7 @@ char*  jsJSON_getString(jsJSON* root, char* key) {
     return NULL;
 }
 
-double jsJSON_getNumber(jsJSON* root, char* key) {
+double jsJSON_getNumber(const jsJSON* root, const char* key) {
     if( root->type != jsJSON_TYPE_OBJECT ) {
         return -1;
     }    
@@ -426,7 +426,7 @@ double jsJSON_getNumber(jsJSON* root, char* key) {
     return -1;
 }
 
-bool jsJSON_getBoolean(jsJSON* root, char* key) {
+bool jsJSON_getBoolean(const jsJSON* root, const char* key) {
     if( root->type != jsJSON_TYPE_OBJECT ) {
         return false;
     }
@@ -440,7 +440,7 @@ bool jsJSON_getBoolean(jsJSON* root, char* key) {
     return false;
 }
 
-jsJSON* jsJSON_getObject(jsJSON* root, char* key) {
+jsJSON* jsJSON_getObject(const jsJSON* root, const char* key) {
     if( root->type != jsJSON_TYPE_OBJECT ) {
         return NULL;
     }
