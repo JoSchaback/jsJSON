@@ -129,10 +129,30 @@ size_t jsJSON_serializeToStr(const jsJSON* root, char *buffer, size_t bufferSize
 */
 jsJSON* jsJSON_parse(const char *json);
 
-char*  jsJSON_getString(const jsJSON* root, const char* key);
-double jsJSON_getNumber(const jsJSON* root, const char* key);
-bool   jsJSON_getBoolean(const jsJSON* root, const char* key);
-bool   jsJSON_getBoolean(const jsJSON* root, const char* key);
-jsJSON* jsJSON_getObject(const jsJSON* root, const char* key);
+/**
+ * Returns the string value for the given key in the given object node. Returns a reference.
+*/
+char*  jsJSON_getString(const jsJSON* objectNode, const char* key);
+
+/**
+ * Returns the number value for the given key in the given object node.
+*/
+double jsJSON_getNumber(const jsJSON* objectNode, const char* key);
+
+/**
+ * Returns the boolean value for the given key in the given object node.
+*/
+bool   jsJSON_getBoolean(const jsJSON* objectNode, const char* key);
+
+/**
+ * Returns the child object node for the given key in the given object node.
+*/
+jsJSON* jsJSON_getObject(const jsJSON* objectNode, const char* key);
+
+/**
+ * Duplicates the given JSON tree with all children and string values.
+*/
+jsJSON* jsJSON_duplicate(const jsJSON* root);
+
 
 #endif // JS_JSON_H

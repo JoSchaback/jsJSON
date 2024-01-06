@@ -453,3 +453,25 @@ jsJSON* jsJSON_getObject(const jsJSON* root, const char* key) {
     }
     return NULL;
 }
+
+jsJSON* jsJSON_duplicate(const jsJSON* root) {
+    // note, jsJSON_new duplicates the key string
+    jsJSON* newRoot = jsJSON_new(root->type, root->key);
+    newRoot->boolValue   = root->boolValue;
+    newRoot->numberValue = root->numberValue;
+
+    if( root->stringValue != NULL ) {
+        newRoot->stringValue = jsJSON_strdup(root->stringValue);
+    }
+
+    // duplicate children recursively
+    if( root->children != NULL ) {
+        jsJSON* child = root->children;
+        while( child != NULL ) {
+            jsJSON* newChild = jsJSON_duplicate(child);
+            jsJSON_add(newRoot, newChild);
+            child = child->sibblings;
+        }
+    }
+    return newRoot;
+}
