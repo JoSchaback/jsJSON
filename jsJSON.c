@@ -382,7 +382,9 @@ jsJSON* jsJSON_parse(const char *json) {
  * jsJSON duplicates all strings so that a node tree is
  * self-contained.
 */
-jsJSON* jsJSON_free(jsJSON *root) {
+void jsJSON_free(jsJSON *root) {
+    if( root == NULL ) return;
+
     if (root->type == jsJSON_TYPE_STRING) {
         free(root->stringValue);
     }
@@ -395,7 +397,6 @@ jsJSON* jsJSON_free(jsJSON *root) {
         }
     }
     free(root);
-    return NULL;
 }
 
 char*  jsJSON_getString(const jsJSON* root, const char* key) {

@@ -56,7 +56,7 @@ jsJSON* jsJSON_new(enum jsJSON_TYPE type, const char *key);
 /**
  * Recursively frees the JSON tree including all children and string values.
 */
-jsJSON* jsJSON_free(jsJSON *root);
+void jsJSON_free(jsJSON *root);
 
 /**
  * Creates a new object JSON node. Duplicates the key string, unless NULL.
